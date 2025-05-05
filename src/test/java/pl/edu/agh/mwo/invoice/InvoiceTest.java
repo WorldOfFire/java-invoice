@@ -8,10 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.Invoice;
-import pl.edu.agh.mwo.invoice.product.DairyProduct;
-import pl.edu.agh.mwo.invoice.product.OtherProduct;
-import pl.edu.agh.mwo.invoice.product.Product;
-import pl.edu.agh.mwo.invoice.product.TaxFreeProduct;
+import pl.edu.agh.mwo.invoice.product.*;
 
 public class InvoiceTest {
     private Invoice invoice;
@@ -179,7 +176,24 @@ public class InvoiceTest {
         Assert.assertTrue(output.contains("Jabłko, 8 szt., 2.00 zł"));
         Assert.assertTrue(output.contains("Liczba pozycji: 3"));
     }
-//
+
+    // 3. VAT to nie wszystko
+    @Test
+    public void testProductsWithExcise() {
+        Product wine = new BottleOfWine("Wino czerwone wytrawne", new BigDecimal("20.00"));
+        Product fuel = new FuelCanister("Benzyna", new BigDecimal("100.00"));
+
+        invoice.addProduct(wine);
+        invoice.addProduct(fuel);
+
+        Assert.assertThat(invoice.getNetTotal(), Matchers.comparesEqualTo(new BigDecimal("120.00")));
+
+        BigDecimal expectedTax = new BigDecimal("15.72");
+        Assert.assertThat(invoice.getTaxTotal(), Matchers.comparesEqualTo(expectedTax));
+
+        BigDecimal expectedGross = new BigDecimal("135.72");
+        Assert.assertThat(invoice.getGrossTotal(), Matchers.comparesEqualTo(expectedGross));
+    }
 }
 
 

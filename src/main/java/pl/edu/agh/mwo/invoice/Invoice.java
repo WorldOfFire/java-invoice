@@ -47,11 +47,13 @@ public class Invoice {
         return getGrossTotal().subtract(getNetTotal());
     }
 
+
+
     public BigDecimal getGrossTotal() {
         BigDecimal totalGross = BigDecimal.ZERO;
         for (Product product : products.keySet()) {
             BigDecimal quantity = new BigDecimal(products.get(product));
-            totalGross = totalGross.add(product.getPriceWithTax().multiply(quantity));
+            totalGross = totalGross.add(product.getPriceWithTax().add(product.getExcise()).multiply(quantity));
         }
         return totalGross;
     }
